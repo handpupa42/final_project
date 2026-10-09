@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="text-success mb-3">Заказ №{{ order.id }} успешно оформлен!</h1>
+    <p class="lead">Спасибо за покупку в Glow & Beauty! Мы свяжемся с вами по телефону {{ order.phone }} для подтверждения доставки.</p>
+    <a href="{% url 'shop:product_list' %}" class="btn btn-pink btn-lg mt-3">Вернуться на главную</a>
+</div>
+{% endblock %}
