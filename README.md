@@ -59,7 +59,7 @@ URL	Имя (Name)	Описание
 /checkout/	shop:checkout	Оформление заказа
 /login/	login	Авторизация
 /register/	shop:register	Регистрация нового покупателя
-/admin/	—	Панель управления магазином
+/admin/	—	Панель управления магазином(логин:admin, пароль:admin1)
 ❓ Частые вопросы и их решение
 Ошибка TemplateDoesNotExist: Убедитесь, что все HTML-шаблоны находятся в папке templates/shop/, а главный шаблон base.html — прямо в templates/base.html.
 При миграциях спрашивает default value (timezone.now): Введите 1, затем нажмите Enter — Django подставит текущую дату и время для существующих записей.
