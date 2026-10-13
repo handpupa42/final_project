@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center text-center">
+    <div class="col-md-6">
+        <div class="card p-5 border-0 shadow-lg" style="background-color: #121212; border-radius: 20px;">
+            <h1 class="text-success mb-3">Карта оформлена!</h1>
+            <p class="fs-5">Подарочная карта на сумму <strong>{{ card.amount }} ₽</strong> успешно создана.</p>
+            
+            <div class="p-3 my-4 rounded" style="background-color: #1a1a1a; border: 1px dashed #c5a880;">
+                <p class="text-muted small mb-1">Уникальный код карты:</p>
+                <h3 style="color: #c5a880; letter-spacing: 3px;">{{ card.code }}</h3>
+            </div>
+
+            <p class="text-muted small">Инструкции отправлены на: <strong>{{ card.recipient_email }}</strong></p>
+            <a href="{% url 'shop:home' %}" class="btn btn-pink mt-3">Вернуться на главную</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

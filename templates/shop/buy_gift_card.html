@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Купить подарочную карту — Glow & Beauty{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 shadow-lg border-0" style="background-color: #121212; border-radius: 20px; border: 1px solid #333;">
+            <h2 class="text-center mb-4" style="color: #c5a880; font-family: 'Outfit', sans-serif;">Купить Подарочную Карту 🎁</h2>
+            <p class="text-center text-muted small mb-4">Подарите близким возможность выбрать идеальный уход самостоятельно!</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-light">Выберите номинал карты</label>
+                    <select name="amount" class="form-control rounded-pill border-0 px-3 shadow-sm" style="background-color: #1a1a1a; color: white;">
+                        {% for val, label in amounts %}
+                            <option value="{{ val }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-light">Email получателя</label>
+                    <input type="email" name="email" class="form-control rounded-pill border-0 px-3 shadow-sm" style="background-color: #1a1a1a; color: white;" placeholder="friend@example.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-light">Ваше пожелание</label>
+                    <textarea name="message" class="form-control rounded-3 border-0 px-3 shadow-sm" style="background-color: #1a1a1a; color: white;" rows="4" placeholder="Напишите несколько приятных слов..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-pink w-100 py-3 mt-3 fs-5 shadow-sm" style="font-family: 'Outfit', sans-serif; font-weight: 700;">
+                    Оплатить и отправить &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
