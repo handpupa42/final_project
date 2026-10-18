@@ -3,14 +3,39 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card p-4 shadow-sm border-0">
-            <h3 class="mb-4">Оформление заказа</h3>
-            <h5>Сумма к оплате: <span class="text-danger">{{ total_cost }} ₽</span></h5>
-            <hr>
+        <div class="card p-4 border-secondary shadow-lg">
+            <h3 class="mb-3">Оформление заказа </h3>
+            
+            <div class="p-3 rounded-3 mb-4" style="background-color: #181818;">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Сумма товаров:</span>
+                    <span>{{ subtotal }} ₽</span>
+                </div>
+                <div class="d-flex justify-content-between text-warning">
+                    <span>Итого к оплате:</span>
+                    <strong class="fs-4">{{ total_cost }} ₽</strong>
+                </div>
+            </div>
+
             <form method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-pink btn-lg w-100 mt-3">Подтвердить заказ</button>
+                <div class="row g-3">
+                    <div class="col-md-6">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+                    <div class="col-md-6">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+                    <div class="col-md-6">{{ form.phone.label_tag }} {{ form.phone }}</div>
+                    <div class="col-md-6">{{ form.address.label_tag }} {{ form.address }}</div>
+                    
+                    <div class="col-12 mt-4 p-3 rounded-3" style="border: 1px dashed var(--luxury-gold);">
+                        <label class="form-label text-warning fw-bold">🎁 Есть промокод или сертификат?</label>
+                        {{ form.gift_card_code }}
+                        <small class="text-muted">Сумма сертификата спишется в счет оплаты заказа.</small>
+                        {% if form.gift_card_code.errors %}
+                            <div class="text-danger small mt-1">{{ form.gift_card_code.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-beauty btn-lg w-100 mt-4 py-3">Подтвердить и заказать</button>
             </form>
         </div>
     </div>

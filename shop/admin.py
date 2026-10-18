@@ -1,60 +1,75 @@
 from django.contrib import admin
-from .models import CartItem, Category, GiftCard, Order, Product
+from .models import CartItem, Category, GiftCard, Order, OrderItem, Product, Review
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-  list_display = ("name", "slug")
-  prepopulated_fields = {"slug": ("name",)}
+  list_display = ('name', 'slug')
+  prepopulated_fields = {'slug': ('name',)}
+  search_fields = ('name',)
+
+
+class OrderItemInline(admin.TabularInline):
+  model = OrderItem
+  extra = 0
+  readonly_fields = ('product', 'price', 'quantity')
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
   list_display = (
-      "brand",
-      "name",
-      "category",
-      "price",
-      "stock",
-      "is_available",
-      "created",
+      'brand',
+      'name',
+      'seller',
+      'category',
+      'price',
+      'stock',
+      'is_available',
   )
-  list_filter = ("is_available", "category", "brand")
-  list_editable = ("price", "stock", "is_available")
-  search_fields = ("name", "brand", "description")
-  prepopulated_fields = {"slug": ("name",)}
+  list_filter = ('is_available', 'category', 'brand')
+  list_editable = ('price', 'stock', 'is_available')
+  search_fields = ('name', 'brand', 'description')
+  prepopulated_fields = {'slug': ('name',)}
+  autocomplete_fields = ('category', 'seller')
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
   list_display = (
-      "id",
-      "user",
-      "first_name",
-      "last_name",
-      "phone",
-      "total_cost",
-      "is_paid",
-      "created_at",
+      'id',
+      'user',
+      'phone',
+      'total_cost',
+      'discount',
+      'status',
+      'created_at',
   )
-  list_filter = ("is_paid", "created_at")
-  search_fields = ("first_name", "last_name", "phone", "address")
+  list_filter = ('status', 'created_at')
+  list_editable = ('status',)
+  search_fields = ('first_name', 'last_name', 'phone', 'address')
+  inlines = [OrderItemInline]
 
 
 @admin.register(GiftCard)
 class GiftCardAdmin(admin.ModelAdmin):
   list_display = (
-      "code",
-      "buyer",
-      "amount",
-      "recipient_email",
-      "is_active",
-      "created_at",
+      'code',
+      'buyer',
+      'amount',
+      'recipient_email',
+      'is_used',
+      'created_at',
   )
-  list_filter = ("is_active", "amount", "created_at")
-  search_fields = ("code", "recipient_email", "buyer__username")
+  list_filter = ('is_used', 'amount', 'created_at')
+  search_fields = ('code', 'recipient_email')
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+  list_display = ('product', 'user', 'rating', 'created_at')
+  list_filter = ('rating', 'created_at')
 
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-  list_display = ("user", "product", "quantity")
+  list_display = ('user', 'product', 'quantity')

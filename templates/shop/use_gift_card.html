@@ -1,0 +1,44 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Проверка и активация карты — Glow & Beauty{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-5 border-secondary shadow-lg">
+            <h2 class="text-center mb-3" style="color: var(--luxury-gold);">Проверка сертификата 💳</h2>
+            <p class="text-center text-muted small mb-4">
+                Введите промокод подарочной карты, чтобы узнать баланс и статус активности.
+            </p>
+
+            {% if message %}
+                <div class="alert {% if success %}alert-success bg-dark text-success border-success{% else %}alert-danger bg-dark text-danger border-danger{% endif %} text-center">
+                    {{ message }}
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label text-light small fw-bold">Код подарочной карты:</label>
+                    <input type="text" name="code" class="form-control rounded-pill text-uppercase text-center fs-5 px-3 py-2" placeholder="GB-XXXXXXXX" required style="letter-spacing: 2px;">
+                </div>
+                <button type="submit" class="btn btn-beauty w-100 py-3 mt-2">Проверить карту</button>
+            </form>
+
+            <div class="mt-4 p-3 rounded-3 text-center" style="background-color: #171717;">
+                <p class="text-muted small mb-1">Как использовать карту для оплаты?</p>
+                <span class="small text-secondary">
+                    Добавьте товары в корзину и введите этот промокод на странице оформления заказа (Checkout). Сумма карты спишется автоматически!
+                </span>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'shop:buy_gift_card' %}" class="small text-muted text-decoration-none">
+                    Нужен новый подарок? Купить подарочную карту &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

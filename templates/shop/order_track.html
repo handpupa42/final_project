@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="card p-5 border-secondary shadow-lg">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary">
+                <div>
+                    <h2 class="mb-1">Трекинг заказа #{{ order.id }}</h2>
+                    <span class="text-muted small">Оформлен: {{ order.created_at|date:"d.m.Y в H:i" }}</span>
+                </div>
+                <a href="{% url 'shop:my_orders' %}" class="btn btn-outline-secondary rounded-pill btn-sm">&larr; Все заказы</a>
+            </div>
+
+            <div class="my-4 p-4 rounded-4" style="background-color: #141414; border: 1px solid #222;">
+                <div class="text-center mb-4">
+                    <span class="text-muted small text-uppercase letter-spacing">Текущий этап:</span>
+                    <h3 class="text-warning mt-1">
+                        {% if order.status == 'created' %} Заказ принят и ожидает сборки
+                        {% elif order.status == 'processing' %} Заказ комплектуется на складе
+                        {% elif order.status == 'in_transit' %} Курьер доставляет вашу посылку
+                        {% elif order.status == 'delivered' %}✅ Заказ успешно вручен!
+                        {% else %}❌ Заказ отменен
+                        {% endif %}
+                    </h3>
+                </div>
+
+                <div class="position-relative m-4">
+                    <div class="progress" style="height: 6px; background-color: #2b2b2b;">
+                        {% if order.status == 'created' %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 15%"></div>
+                        {% elif order.status == 'processing' %}
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 50%"></div>
+                        {% elif order.status == 'in_transit' %}
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 80%"></div>
+                        {% elif order.status == 'delivered' %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row text-center mt-3 g-2">
+                    <div class="col-3">
+                        <div class="fs-4 {% if current_step_index >= 0 %}text-info{% else %}text-muted{% endif %}">📝</div>
+                        <div class="small fw-bold {% if current_step_index >= 0 %}text-white{% else %}text-muted{% endif %}">1. Принят</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Оформлен на сайте</span>
+                    </div>
+                    <div class="col-3">
+                        <div class="fs-4 {% if current_step_index >= 1 %}text-warning{% else %}text-muted{% endif %}">📦</div>
+                        <div class="small fw-bold {% if current_step_index >= 1 %}text-white{% else %}text-muted{% endif %}">2. Сборка</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Продавцом</span>
+                    </div>
+                    <div class="col-3">
+                        <div class="fs-4 {% if current_step_index >= 2 %}text-primary{% else %}text-muted{% endif %}">🚚</div>
+                        <div class="small fw-bold {% if current_step_index >= 2 %}text-white{% else %}text-muted{% endif %}">3. В пути</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Передан службе доставки</span>
+                    </div>
+                    <div class="col-3">
+                        <div class="fs-4 {% if current_step_index >= 3 %}text-success{% else %}text-muted{% endif %}">✨</div>
+                        <div class="small fw-bold {% if current_step_index >= 3 %}text-white{% else %}text-muted{% endif %}">4. Доставлен</div>
+                        <span class="text-muted" style="font-size: 0.75rem;">Вручен получателю</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-2">
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 h-100" style="background-color: #141414; border: 1px solid #222;">
+                        <h6 class="text-warning mb-3"> Данные доставки</h6>
+                        <p class="mb-1 text-light"><strong>Получатель:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+                        <p class="mb-1 text-light"><strong>Контактный телефон:</strong> {{ order.phone }}</p>
+                        <p class="mb-0 text-light"><strong>Адрес:</strong> {{ order.address }}</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="p-3 rounded-3 h-100" style="background-color: #141414; border: 1px solid #222;">
+                        <h6 class="text-warning mb-3">🧾 Чек заказа</h6>
+                        <ul class="list-unstyled mb-2">
+                            {% for item in order.items.all %}
+                                <li class="d-flex justify-content-between small text-secondary py-1">
+                                    <span>{{ item.product.name }} &times; {{ item.quantity }}</span>
+                                    <span class="text-white">{{ item.get_cost }} ₽</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% if order.discount > 0 %}
+                            <div class="d-flex justify-content-between text-success small pt-1 border-top border-secondary">
+                                <span>Скидка по карте:</span>
+                                <span>-{{ order.discount }} ₽</span>
+                            </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-between text-white fw-bold fs-5 pt-2 border-top border-secondary mt-2">
+                            <span>Итого:</span>
+                            <span class="text-warning">{{ order.total_cost }} ₽</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

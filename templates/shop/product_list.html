@@ -2,48 +2,119 @@
 
 {% block content %}
 <div class="row">
+
     <div class="col-md-3 mb-4">
-        <div class="card p-3 shadow-sm border-0" style="background-color: white; border-radius: 16px;">
-            <h5 class="mb-3 text-pink fw-bold" style="color: #d63384;">Категории</h5>
+
+        <div class="card p-3 border-secondary mb-3">
+            <h5 class="mb-3 text-pink fw-bold">Категории</h5>
             <div class="list-group list-group-flush">
-                <a href="{% url 'shop:product_list' %}" class="list-group-item list-group-item-action {% if not category %}fw-bold text-danger{% endif %}" style="border: none;">Все товары</a>
+                <a href="{% url 'shop:product_list' %}" class="list-group-item list-group-item-action bg-transparent text-white {% if not category %}fw-bold text-danger border-bottom-0{% endif %}">
+                    Все товары
+                </a>
                 {% for c in categories %}
-                    <a href="{% url 'shop:product_list_by_category' c.slug %}" class="list-group-item list-group-item-action {% if category.slug == c.slug %}fw-bold text-danger{% endif %}" style="border: none;">{{ c.name }}</a>
+                    <a href="{% url 'shop:product_list_by_category' c.slug %}" class="list-group-item list-group-item-action bg-transparent text-white {% if category.slug == c.slug %}fw-bold text-danger{% endif %}">
+                        {{ c.name }}
+                    </a>
                 {% endfor %}
             </div>
+        </div>
+
+        <div class="card p-3 border-secondary">
+            <h6 class="text-warning fw-bold mb-3">Фильтр по цене</h6>
+            <form method="get">
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <input type="number" name="min_price" class="form-control form-control-sm" placeholder="От ₽" value="{{ min_price|default:'' }}">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" name="max_price" class="form-control form-control-sm" placeholder="До ₽" value="{{ max_price|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="in_stock" value="1" id="inStockCheck" {% if in_stock == '1' %}checked{% endif %}>
+                    <label class="form-check-label small" for="inStockCheck">
+                        Только в наличии
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-beauty btn-sm w-100">Применить</button>
+                <a href="{% url 'shop:product_list' %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Сбросить</a>
+            </form>
         </div>
     </div>
 
     <div class="col-md-9">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">{% if category %}{{ category.name }}{% else %}Каталог косметики{% endif %}</h2>
-            <a href="{% url 'shop:home' %}" class="btn btn-outline-beauty btn-sm px-3">
-                &larr; На главную
-            </a>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h2 class="mb-0">{% if category %}{{ category.name }}{% else %}Каталог косметики{% endif %}</h2>
+                <small class="text-muted">Найдено: {{ products.count }} товаров</small>
+            </div>
+
+            <form method="get" class="d-flex align-items-center gap-2">
+                {% if category %}<input type="hidden" name="category" value="{{ category.slug }}">{% endif %}
+                {% if min_price %}<input type="hidden" name="min_price" value="{{ min_price }}">{% endif %}
+                {% if max_price %}<input type="hidden" name="max_price" value="{{ max_price }}">{% endif %}
+                {% if in_stock %}<input type="hidden" name="in_stock" value="{{ in_stock }}">{% endif %}
+                
+                <label class="small text-muted text-nowrap mb-0">Сортировка:</label>
+                <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()" style="width: auto;">
+                    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Сначала новые</option>
+                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Сначала дешевле</option>
+                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Сначала дороже</option>
+                    <option value="name" {% if sort == 'name' %}selected{% endif %}>По названию (А-Я)</option>
+                </select>
+            </form>
         </div>
 
         <div class="row">
             {% for product in products %}
                 <div class="col-md-4 mb-4">
-                    <div class="card card-product h-100 p-3">
+                    <div class="card card-product h-100 p-3 position-relative">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'shop:toggle_favorite' product.id %}" class="position-absolute top-0 end-0 m-3 fs-5 text-decoration-none" title="В избранное">
+                                {% if user in product.favorites.all %}
+                                    ❤️
+                                {% else %}
+                                    🤍
+                                {% endif %}
+                            </a>
+                        {% endif %}
+
+                        {% if product.stock > 0 and product.stock <= 3 %}
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-3">🔥 Осталось {{ product.stock }} шт.!</span>
+                        {% endif %}
+
                         {% if product.image %}
                             <img src="{{ product.image.url }}" class="card-img-top" style="height: 200px; object-fit: contain;" alt="{{ product.name }}">
                         {% else %}
-                            <div class="bg-light text-muted text-center d-flex align-items-center justify-content-center" style="height: 200px; border-radius: 12px;">Нет фото</div>
+                            <div class="bg-black text-muted text-center d-flex align-items-center justify-content-center" style="height: 200px; border-radius: 12px;">Нет фото</div>
                         {% endif %}
-                        <div class="card-body d-flex flex-column text-center mt-2">
+
+                        <div class="card-body d-flex flex-column text-center mt-2 p-0">
                             <small class="text-uppercase text-muted fw-bold">{{ product.brand }}</small>
-                            <h5 class="card-title fs-6 mt-1" style="font-weight: 600;">{{ product.name }}</h5>
+                            <h5 class="card-title fs-6 mt-1">{{ product.name }}</h5>
+
+                            {% if product.average_rating %}
+                                <div class="text-warning small mb-1">⭐ {{ product.average_rating }}</div>
+                            {% endif %}
+
                             <p class="text-danger fw-bold fs-5 mt-auto mb-2">{{ product.price }} ₽</p>
-                            <a href="{{ product.get_absolute_url }}" class="btn btn-outline-beauty btn-sm mt-2">Подробнее</a>
+                            <div class="d-flex gap-1">
+                                <a href="{{ product.get_absolute_url }}" class="btn btn-outline-light btn-sm w-100">Подробнее</a>
+                                {% if product.stock > 0 %}
+                                    <a href="{% url 'shop:add_to_cart' product.id %}" class="btn btn-beauty btn-sm px-3" title="В корзину">🛒</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
             {% empty %}
                 <div class="col-12">
-                    <div class="alert alert-info text-center py-4" style="border-radius: 16px;">
-                        <h5>Товары пока не добавлены </h5>
-                        <p class="mb-0">Зайди в <a href="{% url 'admin:index' %}" class="alert-link text-decoration-none">панель администратора</a> под своим аккаунтом и добавь товары с галочкой "Доступен".</p>
+                    <div class="alert alert-dark text-center py-5 border-secondary">
+                        <h5>По вашему запросу товары не найдены 🌸</h5>
+                        <p class="text-muted mb-0">Попробуйте изменить параметры фильтрации или сбросить фильтры.</p>
                     </div>
                 </div>
             {% endfor %}
